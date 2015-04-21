@@ -1,0 +1,2 @@
+//= require jQuery
+//= require bootstrap
