@@ -7,6 +7,7 @@
 //= require ../lib/lodash.js
 //= require ../stores/job-store.js
 //= require ../stores/job-meta-store.js
+//= require paginator.jsx
 //= require commons.jsx
 
 var JobList = React.createClass({
@@ -15,25 +16,38 @@ var JobList = React.createClass({
     _sort: {field: "doAt", order: "desc"},
     _filterAvailable: ["OPEN", "WORKING", "SUCCESSFUL", "FAILED", "SKIPPED"],
     _filters: ["OPEN"],
+    _page: 1,
+    _max: 20,
 
     getInitialState: function () {
-        return {list: [], total: 0, max: 20, page: 1};
+        return {list: [], total: 0};
+    },
+
+    setPage: function (page) {
+      ReactMiniRouter.navigate("/jobs/" + page, true);
+      this._page = page;
+      this.updateList();
     },
 
     updateList: function () {
         if (this.isMounted()) {
-            JobStore.list(this._sort.field, this._sort.order, this.state.max, (this.state.page - 1) * this.state.max, this._filters, this.listUpdated);
+            JobStore.list(this._sort.field, this._sort.order, this._max, (this._page - 1) * this._max, this._filters, this.listUpdated);
         }
     },
 
     listUpdated: function (resp) {
-        this.state.list = resp.list
-        this.setState(this.state);
+        this.state.list = resp.list;
+        this.setState({list: resp.list, total: resp.total});
     },
 
     componentDidMount: function () {
         this.updateList();
         this._intervalid = setInterval(this.updateList, 5000);
+    },
+
+    componentWillMount: function(){
+        this._page = this.props.page || 1;
+        this._max = Number(localStorage.getItem("uberjobs.settings.max")) || 20
     },
 
     componentWillUnmount: function () {
@@ -58,6 +72,27 @@ var JobList = React.createClass({
         this.updateList();
     },
 
+    allButtonClicked: function(){
+        this._filters = this._filterAvailable.slice(0);
+        this.updateList();
+    },
+
+    resetbuttonClicked: function(){
+        this._filters = ['OPEN'];
+        this.updateList();
+    },
+
+    onPaginate: function(page){
+        debugger;
+    },
+
+    maxButtonClicked: function(e){
+        var value = $(e.target).data("value");
+        localStorage.setItem("uberjobs.settings.max", value);
+        this._max = parseInt(value);
+        this.updateList();
+    },
+
     render: function () {
         var listItems = [];
         for (var i = 0; i < this.state.list.length; i++) {
@@ -72,18 +107,33 @@ var JobList = React.createClass({
             buttons.push(<button onClick={this.filterButtonClicked} type="button" className={classes} key={filter} data-filter={filter}>{filter}</button>)
         }.bind(this));
 
+        var maxes = [20,50,100]
+        var maxButtons = []
+        _.each(maxes, function(value){
+            var classes = cx({"btn": true, "btn-default": this._max !== value, "btn-success": this._max === value});
+            maxButtons.push(<button onClick={this.maxButtonClicked} type="button" className={classes} key={value} data-value={value}>{value}</button>)
+        }.bind(this));        
         return (
             <div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <div className="btn-group" role="group" aria-label="StatusFilter">
-                          {buttons}
+                        <div className="btn-toolbar">
+                            <div className="btn-group" role="group" aria-label="StatusFilter">
+                              {buttons}
+                            </div>
+                            <div className="btn-group" role="group" aria-label="StatusFilter">
+                              <button onClick={this.allButtonClicked} type="button" className="btn btn-default" key="ALL" >all</button>
+                              <button onClick={this.resetbuttonClicked} type="button" className="btn btn-default" key="NONE" >&times;</button>
+                            </div>
+                            <div className="btn-group" role="group" aria-label="StatusFilter">
+                              {maxButtons}
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <table className="table table-bordered table-condensed table-responsive">
+                        <table className="table table-hover table-condensed table-responsive">
                             <thead>
                             <SortableColumn text="Execution Time" field="doAt" onToggled={this.sortChanged} current={this._sort}/>
                             <SortableColumn text="Queue" field="queue" onToggled={this.sortChanged} current={this._sort}/>
@@ -97,6 +147,7 @@ var JobList = React.createClass({
                             {listItems}
                             </tbody>
                         </table>
+                        <Pager pages={Math.ceil(this.state.total / this._max)} current={this._page} onChange={this.setPage} />
                     </div>
                 </div>
             </div>

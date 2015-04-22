@@ -16,7 +16,7 @@ var App = React.createClass({
     routes: {
         '/': 'home',
         '/jobs/enqueue': 'jobEnqueue',
-        '/jobs': 'jobList',
+        '/jobs/:page': 'jobList',
         '/workers': 'workerList',
         '/queues': 'queueList'
     },
@@ -37,9 +37,14 @@ var App = React.createClass({
         return <Overview />;
     },
 
-    jobList: function(){
+    jobList: function(page){
       window.action = Actions.JOBS_LIST;
-      return <JobList />;
+      if(isNaN(page)){
+        page = 1;
+      } else {
+        page = parseInt(page);
+      }
+      return <JobList page={page}/>;
     },
 
     jobEnqueue: function(){

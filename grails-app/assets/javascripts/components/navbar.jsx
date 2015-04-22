@@ -37,7 +37,7 @@ var Navbar = React.createClass({
             <li className={jobClasses}>
               <a href="javascript: void(0)" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jobs <span className="caret"></span></a>
               <ul className="dropdown-menu" role="menu">
-                <NavbarItem text="List" action={Actions.JOBS_LIST} target="/jobs" />
+                <NavbarItem text="List" action={Actions.JOBS_LIST} target="/jobs/1" />
                 <NavbarItem text="Enqueue" action={Actions.JOBS_MANUAL} target="/jobs/enqueue" />
               </ul>
             </li>
