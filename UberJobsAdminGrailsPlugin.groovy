@@ -1,5 +1,5 @@
 class UberJobsAdminGrailsPlugin {
-    def version = "0.1"
+    def version = "0.1-SNAPSHOT"
     def grailsVersion = "2.4 > *"
     def dependsOn = ["asset-pipeline": "2.0 > *", "less-asset-pipeline": "2.0 > *", "react-asset-pipeline": "1.1.2 > *"]
     def pluginExcludes = [
