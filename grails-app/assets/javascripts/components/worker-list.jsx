@@ -30,6 +30,11 @@ var WorkerList = React.createClass({
     this._intervalid = setInterval(this.updateList, 5000)
   },
 
+  componentWillMount: function(){    
+    this._includeIdle = localStorage.getItem("uberjobs.settings.showIdlingWorkers") === 'true'
+    this._includeStopped = localStorage.getItem("uberjobs.settings.showStoppedWorkers") === 'true'
+  },
+
   componentWillUnmount: function(){
     clearInterval(this._intervalid)
   },
@@ -41,11 +46,13 @@ var WorkerList = React.createClass({
 
   idleCheckBoxChanged: function(e){
     this._includeIdle = $(e.target).prop('checked');
+    localStorage.setItem("uberjobs.settings.showIdlingWorkers", this._includeIdle);
     this.updateList();
   },
 
   stoppedCheckBoxChanged: function(e){
     this._includeStopped = $(e.target).prop('checked');
+    localStorage.setItem("uberjobs.settings.showStoppedWorkers", this._includeStopped);
     this.updateList();
   },
 
@@ -59,10 +66,10 @@ var WorkerList = React.createClass({
       <div>
       <div className="row">
         <div className="col-sm-4 col-sm-offset-4">
-          <label htmlFor="includeIdle">Show Idling <input id="includeIdle" type="checkbox" onChange={this.idleCheckBoxChanged}/></label>
+          <label htmlFor="includeIdle">Show Idling <input id="includeIdle" type="checkbox" onChange={this.idleCheckBoxChanged} checked={this._includeIdle} /></label>
         </div>
         <div className="col-sm-4">
-          <label htmlFor="includeStopped">Show Stopped <input id="includeStopped" type="checkbox" onChange={this.stoppedCheckBoxChanged}/></label>
+          <label htmlFor="includeStopped">Show Stopped <input id="includeStopped" type="checkbox" onChange={this.stoppedCheckBoxChanged} checked={this._includeStopped} /></label>
         </div>
       </div>
       <div className="row">

@@ -29,6 +29,11 @@ var QueueList = React.createClass({
     this._intervalid = setInterval(this.updateList, 5000)
   },
 
+  componentWillMount: function(){
+    var includeEmptyFromStorage = localStorage.getItem("uberjobs.settings.showEmptyQueues")
+    this._includeEmpty = includeEmptyFromStorage === 'false' ? false : true
+  },
+
   componentWillUnmount: function(){
     clearInterval(this._intervalid)
   },
@@ -39,7 +44,8 @@ var QueueList = React.createClass({
   },
 
   emptyCheckboxChanged: function(e){
-      this._includeEmpty = $(e.target).prop('checked');
+    this._includeEmpty = $(e.target).prop('checked');
+    localStorage.setItem("uberjobs.settings.showEmptyQueues", this._includeEmpty)
     this.updateList();
   },
 
@@ -53,7 +59,7 @@ var QueueList = React.createClass({
       <div>
         <div className="row">
           <div className="col-sm-4 col-sm-offset-8">
-            <label htmlFor="includeEmpty">Show Empty <input id="includeEmpty" checked={this._includeEmpty} type="checkbox" onChange={this.emptyCheckboxChanged}/></label>
+            <label htmlFor="includeEmpty">Show Empty <input id="includeEmpty" checked={this._includeEmpty} type="checkbox" onChange={this.emptyCheckboxChanged} checked={this._includeEmpty} /></label>
           </div>
         </div>
         <div className="row">
