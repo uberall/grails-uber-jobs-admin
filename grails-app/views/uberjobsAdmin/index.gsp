@@ -5,7 +5,7 @@
     <asset:stylesheet src="uberjobs-admin" />
     <asset:javascript src="uberjobs-admin" />
     <script type="text/javascript">
-    	window.baseUrl = 'http://localhost:8080/uberjobs'
+    	window.baseUrl = "${baseUrl}";
     </script>
 </head>
 

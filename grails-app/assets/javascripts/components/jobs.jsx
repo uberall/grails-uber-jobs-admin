@@ -173,9 +173,10 @@ var JobListItem = React.createClass({
 var JobManualView = React.createClass({
 
     _jobs: [],
+    _queues: [],
 
     getInitialState: function () {
-        return {job: "", args: [{key: 1, value: ""}], sending: false, success: null};
+        return {job: "", args: [{key: 1, value: ""}], queue: "", sending: false, success: null};
     },
 
     componentWillMount: function () {
@@ -184,8 +185,9 @@ var JobManualView = React.createClass({
             for (var i = 0; i < resp.list.length; i++) {
                 this._jobs.push(resp.list[i].job);
             }
-            this.setState({job: this.state.job, args: this.state.args, sending: this.state.sending, success: this.state.success});
+            this.setState(this.state);
         }.bind(this));
+        
     },
 
     enqueue: function (e) {
@@ -212,6 +214,7 @@ var JobManualView = React.createClass({
 
             sendJob.args.push(value);
         });
+        sendJob.queue = this.state.queue;
         JobStore.enqueue(sendJob, function(){
             this.state.sending = false;
             this.state.success = true;
@@ -225,7 +228,7 @@ var JobManualView = React.createClass({
             return chr.key;
         });
         args.push({key: maxKey.key + 1, val: ""});
-        this.setState({jobs: this.state.jobs, args: args, sending: this.state.sending, success: this.state.success});
+        this.setState({jobs: this.state.jobs, args: args, queue: this.state.queue,sending: this.state.sending, success: this.state.success});
     },
 
     argChanged: function (e) {
@@ -237,11 +240,18 @@ var JobManualView = React.createClass({
                 arg.value = $self.val();
             }
         }
-        this.setState({jobs: this.state.jobs, args: args, sending: this.state.sending, success: this.state.success});
+        this.state.args = args;
+        this.setState(this.state);
     },
 
     typeaheadValueChanged: function (value) {
-        this.setState({job: value, args: this.state.args, sending: this.state.sending, success: this.state.success});
+        this.state.job = value;
+        this.setState(this.state);
+    },
+
+    queueValueChanged: function(e){
+        this.state.queue = e.target.value;
+        this.setState(this.state);
     },
 
     alertButtonClicked: function(){
@@ -271,10 +281,17 @@ var JobManualView = React.createClass({
                     </div>
                     <form method="POST" className="form-horizontal" onSubmit={this.enqueue}>
                         <div className="form-group">
-                            <label for="job" className="col-sm-2 control-label">Job</label>
+                            <label htmlFor="job" className="col-sm-2 control-label">Job</label>
 
                             <div className="col-sm-10">
                                 <Typeahead array={this._jobs} name="job" id="job" value={this.state.job} valueChange={this.typeaheadValueChanged}/>
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="queue" className="col-sm-2 control-label">Queue</label>
+
+                            <div className="col-sm-10">
+                                <input type="text" name="queue" id="queue" value={this.state.queue} onChange={this.queueValueChanged} className="form-control" placeholder="optional, if not set: default queue for this job will be used"/>
                             </div>
                         </div>
                         <div className="form-group">
