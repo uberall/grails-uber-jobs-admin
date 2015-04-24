@@ -115,6 +115,7 @@ var WorkerList = React.createClass({
                             <SortableColumn text="Pool" field="poolName" onToggled={this.sortChanged} current={this._sort}/>
                             <SortableColumn text="index" field="index" onToggled={this.sortChanged} current={this._sort}/>
                             <th>Queues</th>
+                            <th></th>
                             </thead>
                             <tbody>
                             {workerList}
@@ -140,6 +141,10 @@ var WorkerListItem = React.createClass({
       this.setState(this.state);  
     },
 
+    onEditButtonClicked: function () {
+        ReactMiniRouter.navigate("/worker/" + this.props.worker.id)
+    },
+
     render: function () {
         var cx = React.addons.classSet;
         var worker = this.props.worker
@@ -159,6 +164,74 @@ var WorkerListItem = React.createClass({
                 <button type="button" className="btn btn-default" onClick={this.onQueueButtonPressed}>{worker.queues.length}</button>
                 <pre className={queueNameClasses}>{queueNames.join(", ")}</pre>
             </td>
+            <td><a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i
+                    className="fa fa-pencil"></i></a></td>
         </tr>)
+    }
+});
+
+var WorkerDetails = React.createClass({
+
+    _initialWorker: null,
+
+    getInitialState: function() {
+      return {
+        worker: {},
+        errors: {},
+        sending: false,
+        success: null
+      };
+    },
+
+    componentWillMount: function() {
+        if(this.props.id === 'add') {
+            // do nothing as we want to add a worker
+        } else if(!isNaN(this.props.id)){
+            WorkerStore.get(this.props.id, function (resp) {
+                this._initialWorker = _.clone(response.worker, true);
+                this.state.worker = resp.worker;
+                this.setState(this.state);
+            }.bind(this), function () {
+                ReactMiniRouter.navigate("/workers/1");
+            })
+        } else {
+            ReactMiniRouter.navigate("/workers/1");
+        }
+    },
+
+    onSaveSuccess: function (response) {
+        if(this.props.id === 'add'){
+            // just navigate to update page of the created worker
+            ReactMiniRouter.navigate("/worker/"+respone.worker.id, true)
+        } else {
+            this.state.sending = false;
+            this.state.success = true;
+            this.state.worker = response.worker;
+            this._initialWorker = _.clone(response.worker, true);
+            this.setState(this.state)
+        }
+        
+    },
+
+    onSaveError: function (response) {
+        this.state.sending = false;
+        this.state.success = false;
+        this.state.error = resp.responseJSON.error;
+        this.setState(this.state)
+    }
+
+    onFormSubmit: function (e) {
+        this.state.sending = true;
+        this.setState(this.state)
+        if(this.state.worker.id) {
+            WorkerStore.update(worker, this.onSaveSuccess, this.onSaveError)
+        }
+        e.preventDefault();
+    }
+
+    render: function() {
+        return (
+            <div />
+        );
     }
 });

@@ -1,45 +1,46 @@
 'use strict';
 
 var WorkerStore = {
-	_workers: {},
-
-	_total: {},
-
+	
 	basePath: "workers",
 
 	list: function(sort, order, max, offset, includeIdle, includeStopped, success){
 		$.ajax({
 			url: window.baseUrl + "/" + this.basePath,
 			data: {sort: sort, order: order, max: max, offset:offset, includeIdle: includeIdle, includeStopped: includeStopped},
-			success: function(resp){
-				var list   = resp.list;
-				this._total = resp.total;
-
-				for(var i = 0; i<list.length; i++){
-					this._addToWorkers(list[i]);
-				}
-
-				success(resp)
-
-			}.bind(this)
+			success: success
 		})
 	},
 
-	get: function(id, callback){
-		if(this._workers[id] === undefined) {
-			$.ajax({
-				url: window.baseUrl + "/" + this.basePath +"/"+ id,
-				success: function(resp){
-					this._addToWorkers(resp.worker)
-					callback(resp.worker)
-				}.bind(this)
-			})
-		} else {
-			callback(this._workers[id])
-		}
+	get: function(id, success, error){
+		$.ajax({
+			url: window.baseUrl + "/" + this.basePath +"/"+ id,
+			success: success,
+			error: error
+		})
 	},
 
-	_addToWorkers: function(worker){
-		this._workers[worker.id] = worker;
+	update: function(worker, success, error){
+		$.ajax({
+			url: window.baseUrl + "/" + this.basePath + "/" + worker.id,
+			method: "PUT",
+			contentType : "application/json",
+			data: JSON.stringify(worker),
+			success: success,
+			error: error
+		})
+	},
+
+
+
+	add: function (worker, success, error) {
+		$.ajax({
+			url: window.baseUrl + "/" + this.basePath + "/",
+			method: "POST",
+			contentType : "application/json",
+			data: JSON.stringify(worker),
+			success: success,
+			error: error
+		})
 	}
 }

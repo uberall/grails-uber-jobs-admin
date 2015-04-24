@@ -50,6 +50,7 @@ var Navbar = React.createClass({
         var cx = React.addons.classSet;
         var jobClasses = cx({'dropdown': true, 'active': window.action === Actions.JOBS_LIST || window.action === Actions.JOBS_MANUAL});
         var triggerClasses = cx({'dropdown': true, 'active': window.action === Actions.TRIGGER_LIST || window.action === Actions.TRIGGER_DETAILS});
+        var workerClasses = cx({'dropdown': true, 'active': window.action === Actions.WORKER_LIST || window.action === Actions.WORKER_DETAILS});
         return (
             <nav className="navbar navbar-default navbar-fixed-top">
                 <div className="container">
@@ -80,7 +81,14 @@ var Navbar = React.createClass({
                                     <NavbarItem text="Add" action={Actions.TRIGGER_DETAILS} target="/triggers/add"/>
                                 </ul>
                             </li>
-                            <NavbarItem text="Worker" action={Actions.WORKERS} target="/workers/1"/>
+                            <li className={workerClasses}>
+                                <a href="javascript: void(0)" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Workers <span
+                                    className="caret"></span></a>
+                                <ul className="dropdown-menu" role="menu">
+                                    <NavbarItem text="List" action={Actions.WORKER_LIST} target="/workers/1"/>
+                                    <NavbarItem text="Add" action={Actions.WORKER_MANUAL} target="/worker/add"/>
+                                </ul>
+                            </li>
                             <NavbarItem text="Queues" action={Actions.QUEUES} target="/queues/1"/>
                         </ul>
                         <ul className="nav navbar-nav navbar-right">

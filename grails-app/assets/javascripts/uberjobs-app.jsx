@@ -21,6 +21,7 @@ var App = React.createClass({
         '/triggers/:page': 'triggerList',
         '/triggers/details/:id': 'triggerDetails',
         '/workers/:page': 'workerList',
+        '/worker/:id': 'workerDetails',
         '/queues/:page': 'queueList'
     },
 
@@ -67,8 +68,12 @@ var App = React.createClass({
     },
 
     workerList: function(page){
-      window.action = Actions.WORKERS;
+      window.action = Actions.WORKER_LIST;
       return <WorkerList page={this.getPageAsNumber(page)}/>
+    },
+
+    workerDetails: function(id){
+      window.action = Actions.WORKER_DETAILS;
     },
 
     queueList: function(page){
