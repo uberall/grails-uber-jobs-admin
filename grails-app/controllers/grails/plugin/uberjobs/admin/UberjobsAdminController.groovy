@@ -1,6 +1,6 @@
 package grails.plugin.uberjobs.admin
 
-class UberjobsAdminController {
+class UberJobsAdminController {
 
 	def grailsApplication
 
