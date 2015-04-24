@@ -6,8 +6,8 @@
 //= require components/navbar.jsx
 //= require components/jobs.jsx
 //= require components/triggers.jsx
-//= require components/queue-list.jsx
-//= require components/worker-list.jsx
+//= require components/queues.jsx
+//= require components/workers.jsx
 //= require components/overview.jsx
 
 var App = React.createClass({
@@ -19,8 +19,9 @@ var App = React.createClass({
         '/jobs/enqueue': 'jobEnqueue',
         '/jobs/:page': 'jobList',
         '/triggers/:page': 'triggerList',
-        '/workers': 'workerList',
-        '/queues': 'queueList'
+        '/triggers/details/:id': 'triggerDetails',
+        '/workers/:page': 'workerList',
+        '/queues/:page': 'queueList'
     },
 
     render: function() {
@@ -35,11 +36,7 @@ var App = React.createClass({
     },
 
     getPageAsNumber: function(page){
-      var result = 1
-      if(!isNaN(page)){
-        page = parseInt(page);  
-      }
-      return result;
+      return Number(page) || 1;
     },
 
     home: function() {
@@ -59,19 +56,24 @@ var App = React.createClass({
       return <TriggerList page={this.getPageAsNumber(page)}/>;
     },
 
+    triggerDetails: function (id) {
+      window.action = Actions.Trigger_DETAILS;
+      return <TriggerDetails id={parseInt(id)}/>;
+    },
+
     jobEnqueue: function(){
       window.action = Actions.JOBS_MANUAL;
       return <JobManualView />;
     },
 
-    workerList: function(){
+    workerList: function(page){
       window.action = Actions.WORKERS;
-      return <WorkerList />
+      return <WorkerList page={this.getPageAsNumber(page)}/>
     },
 
-    queueList: function(){
+    queueList: function(page){
       window.action = Actions.QUEUES;
-      return <QueueList />
+      return <QueueList page={this.getPageAsNumber(page)}/>
     },
 
     message: function(text) {

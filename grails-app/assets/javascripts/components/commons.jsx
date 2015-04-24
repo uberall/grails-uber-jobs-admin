@@ -9,6 +9,29 @@ var FromNow = React.createClass({
     }
 });
 
+var MaxButtonGroup = React.createClass({
+
+    propTypes: {
+        numbers: React.PropTypes.array.isRequired,
+        current: React.PropTypes.number,
+        onChange: React.PropTypes.func.isRequired
+    },
+
+    buttonClicked: function (e) {
+        this.props.onChange($(e.target).data("value"))
+    },
+
+    render: function () {
+
+        var maxes = [20, 50, 100]
+        var buttons = []
+        _.each(this.props.numbers, function (value) {
+            var classes = cx({"btn": true, "btn-default": this.props.current !== value, "btn-success": this.props.current === value});
+            buttons.push(<button onClick={this.buttonClicked} type="button" className={classes} key={value} data-value={value}>{value}</button>)
+        }.bind(this));
+        return (<div className="btn-group" role="group" aria-label="MaxFilter">{buttons}</div>)
+    }
+})
 
 var SortableColumn = React.createClass({
 
@@ -33,6 +56,39 @@ var SortableColumn = React.createClass({
 
 });
 
+var ValidateableInput = React.createClass({
+
+    propTypes: {
+        field: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired,
+        value: React.PropTypes.any,
+        onChange: React.PropTypes.func.isRequired,
+        error: React.PropTypes.object,
+        placeholder: React.PropTypes.oneOfType([
+            React.PropTypes.bool,
+            React.PropTypes.string
+        ])
+    },
+
+    render: function (argument) {
+        var cx = React.addons.classSet;
+        var formGroupClasses = cx({
+            'form-group': true,
+            'has-error': this.props.error[this.props.field] !== undefined
+        });
+        return (
+            <div className={formGroupClasses}>
+                <label htmlFor={this.props.field} className="col-sm-2 control-label">{this.props.text}</label>
+
+                <div className="col-sm-10">
+                    <input type="text" className="form-control" id={this.props.field} name={this.props.field} placeholder={this.props.placeholder || this.props.text}
+                           required={this.props.required} value={this.props.value} onChange={this.props.onChange}/>
+                </div>
+            </div>
+        )
+    }
+});
+
 /**
  * taken from https://github.com/priteshgupta/React-Typeahead/blob/master/typeahead.js
  **/
@@ -54,7 +110,7 @@ var Typeahead = React.createClass({
     },
     handleClick: function (e) {
         this.setState({value: e.target.innerHTML, selected: true});
-        if(this.props.valueChange){
+        if (this.props.valueChange) {
             this.props.valueChange(e.target.innerHTML)
         }
     },

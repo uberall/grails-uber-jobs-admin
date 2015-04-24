@@ -24,7 +24,7 @@ var TriggerStore = {
     $.ajax({
       url: window.baseUrl + "/" + this.basePath + "/" + id,
       success: success,
-      error: errror
+      error: error
     })
   },
 
@@ -35,7 +35,7 @@ var TriggerStore = {
       contentType : "application/json",
       data: JSON.stringify(trigger),
       success: success,
-      error: errror
+      error: error
     })
   }
 

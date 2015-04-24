@@ -1,44 +1,44 @@
 'use strict';
 
 var QueueStore = {
-	_queues: {},
-	_total: {},
+    _queues: {},
+    _total: {},
 
-	basePath: "queues",
+    basePath: "queues",
 
-	list: function(sort, order, max, offset, includeEmpty, success){
-		$.ajax({
-			url: window.baseUrl + "/" + this.basePath,
-			data: {sort: sort, order: order, max: max, offset:offset, includeEmpty: includeEmpty},
-			success: function(resp){
-				var list   = resp.list;
-				this._total = resp.total;
+    list: function (sort, order, max, offset, success) {
+        $.ajax({
+            url: window.baseUrl + "/" + this.basePath,
+            data: {sort: sort, order: order, max: max, offset: offset},
+            success: function (resp) {
+                var list = resp.list;
+                this._total = resp.total;
 
-				for(var i = 0; i<list.length; i++){
-					this._addToQueues(list[i]);
-				}
+                for (var i = 0; i < list.length; i++) {
+                    this._addToQueues(list[i]);
+                }
 
-				success(resp)
+                success(resp)
 
-			}.bind(this)
-		})
-	},
+            }.bind(this)
+        })
+    },
 
-	get: function(id, callback){
-		if(this._queue[id] === undefined) {
-			$.ajax({
-				url: window.baseUrl + "/" + this.basePath +"/"+ id,
-				success: function(resp){
-					this._addToQueues(resp.queue)
-					callback(resp.queue)
-				}.bind(this)
-			})
-		} else {
-			callback(this._queue[id])
-		}
-	},
+    get: function (id, callback) {
+        if (this._queue[id] === undefined) {
+            $.ajax({
+                url: window.baseUrl + "/" + this.basePath + "/" + id,
+                success: function (resp) {
+                    this._addToQueues(resp.queue);
+                    callback(resp.queue)
+                }.bind(this)
+            })
+        } else {
+            callback(this._queue[id])
+        }
+    },
 
-	_addToQueues: function(queue){
-		this._queues[queue.id] = queue;
-	}
+    _addToQueues: function (queue) {
+        this._queues[queue.id] = queue;
+    }
 }
