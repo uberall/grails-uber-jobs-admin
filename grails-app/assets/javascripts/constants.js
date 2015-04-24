@@ -6,4 +6,6 @@ var Actions = {
   'JOBS_MANUAL': 'jobsmanual',
   'WORKERS': 'workers',
   'QUEUES': 'queues',
+  'TRIGGER_LIST': 'triggerList',
+  'TRIGGER_DETAILS': 'triggerDetails'
 };

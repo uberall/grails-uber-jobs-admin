@@ -5,6 +5,7 @@
 //= require lib/react-mini-router.js
 //= require components/navbar.jsx
 //= require components/jobs.jsx
+//= require components/triggers.jsx
 //= require components/queue-list.jsx
 //= require components/worker-list.jsx
 //= require components/overview.jsx
@@ -17,6 +18,7 @@ var App = React.createClass({
         '/': 'home',
         '/jobs/enqueue': 'jobEnqueue',
         '/jobs/:page': 'jobList',
+        '/triggers/:page': 'triggerList',
         '/workers': 'workerList',
         '/queues': 'queueList'
     },
@@ -32,6 +34,14 @@ var App = React.createClass({
           )
     },
 
+    getPageAsNumber: function(page){
+      var result = 1
+      if(!isNaN(page)){
+        page = parseInt(page);  
+      }
+      return result;
+    },
+
     home: function() {
         window.action = Actions.OVERVIEW;
         return <Overview />;
@@ -39,12 +49,14 @@ var App = React.createClass({
 
     jobList: function(page){
       window.action = Actions.JOBS_LIST;
-      if(isNaN(page)){
-        page = 1;
-      } else {
-        page = parseInt(page);
-      }
-      return <JobList page={page}/>;
+      
+      return <JobList page={this.getPageAsNumber(page)}/>;
+    },
+
+    triggerList: function(page){
+      window.action = Actions.TRIGGER_LIST;
+      
+      return <TriggerList page={this.getPageAsNumber(page)}/>;
     },
 
     jobEnqueue: function(){

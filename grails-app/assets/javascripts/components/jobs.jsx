@@ -82,10 +82,6 @@ var JobList = React.createClass({
         this.updateList();
     },
 
-    onPaginate: function(page){
-        debugger;
-    },
-
     maxButtonClicked: function(e){
         var value = $(e.target).data("value");
         localStorage.setItem("uberjobs.settings.max", value);
