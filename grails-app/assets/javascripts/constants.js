@@ -8,5 +8,12 @@ var Actions = {
   'WORKER_DETAILS': 'workersDetails',
   'QUEUES': 'queues',
   'TRIGGER_LIST': 'triggerList',
-  'TRIGGER_DETAILS': 'triggerDetails'
+  'TRIGGER_DETAILS': 'triggerDetails',
+  'SETTINGS': 'settings'
 };
+
+
+
+var UserSettings = {
+	REFRESH_INTERVAL: 'refreshInterval',
+}

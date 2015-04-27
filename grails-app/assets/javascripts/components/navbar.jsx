@@ -12,7 +12,11 @@ var NavbarItem = React.createClass({
     render: function () {
         var cx = React.addons.classSet;
         var classes = cx({'active': window.action === this.props.action});
-        return (<li className={classes}><a href="javascript: void(0)" onClick={this.onclick}>{this.props.text}</a></li>)
+        var text = this.props.text;
+        if(this.props.icon){
+            text = (<i className={"fa fa-"+this.props.icon}></i>);
+        }
+        return (<li className={classes}><a href="javascript: void(0)" onClick={this.onclick}>{text}</a></li>);
     }
 });
 
@@ -78,7 +82,7 @@ var Navbar = React.createClass({
                                     className="caret"></span></a>
                                 <ul className="dropdown-menu" role="menu">
                                     <NavbarItem text="List" action={Actions.TRIGGER_LIST} target="/triggers/1"/>
-                                    <NavbarItem text="Add" action={Actions.TRIGGER_DETAILS} target="/triggers/add"/>
+                                    {/*<NavbarItem text="Add" action={Actions.TRIGGER_DETAILS} target="/triggers/add"/>*/}
                                 </ul>
                             </li>
                             <li className={workerClasses}>
@@ -86,13 +90,14 @@ var Navbar = React.createClass({
                                     className="caret"></span></a>
                                 <ul className="dropdown-menu" role="menu">
                                     <NavbarItem text="List" action={Actions.WORKER_LIST} target="/workers/1"/>
-                                    <NavbarItem text="Add" action={Actions.WORKER_MANUAL} target="/worker/add"/>
+                                    {/* <NavbarItem text="Add" action={Actions.WORKER_MANUAL} target="/worker/add"/>*/}
                                 </ul>
                             </li>
                             <NavbarItem text="Queues" action={Actions.QUEUES} target="/queues/1"/>
                         </ul>
                         <ul className="nav navbar-nav navbar-right">
                             <PauseNavbarItem />
+                            <NavbarItem text="" icon="cog" action={Actions.SETTINGS} target="/settings"/>
                         </ul>
                     </div>
                 </div>

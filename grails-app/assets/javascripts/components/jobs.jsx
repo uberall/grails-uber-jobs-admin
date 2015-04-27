@@ -7,6 +7,7 @@
 //= require ../lib/lodash.js
 //= require ../stores/job-store.js
 //= require ../stores/job-meta-store.js
+//= require ../stores/queue-store.js
 //= require paginator.jsx
 //= require commons.jsx
 
@@ -46,7 +47,7 @@ var JobList = React.createClass({
         this._page = this.props.page || 1;
         this._max = Number(localStorage.getItem("uberjobs.settings.jobs.max")) || 20;
         this.updateList(true);
-        this._intervalid = setInterval(this.updateList, 5000);
+        this._intervalid = setInterval(this.updateList, SettingsStore.getSetting(UserSettings.REFRESH_INTERVAL));
     },
 
     componentWillUnmount: function () {

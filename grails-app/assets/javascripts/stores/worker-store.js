@@ -42,7 +42,16 @@ var WorkerStore = {
 
 	stop: function (worker, success) {
 		$.ajax({
-			url: window.baseUrl + "/" + this.basePath + "/" + worker.id + "/pause",
+			url: window.baseUrl + "/" + this.basePath + "/" + worker.id + "/stop",
+			method: "PUT",
+			contentType : "application/json",
+			success: success
+		})	
+	},
+
+	resume: function (worker, success) {
+		$.ajax({
+			url: window.baseUrl + "/" + this.basePath + "/" + worker.id + "/resume",
 			method: "PUT",
 			contentType : "application/json",
 			success: success

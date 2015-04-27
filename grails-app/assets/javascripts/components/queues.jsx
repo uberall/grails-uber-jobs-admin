@@ -2,6 +2,8 @@
 //= require react-with-addons
 //= require ../lib/react-mini-router.js
 //= require ../stores/queue-store.js
+//= require ../stores/settings-store.js
+//= require ../stores/queue-store.js
 //= require commons.jsx
 
 var QueueList = React.createClass({
@@ -39,7 +41,7 @@ var QueueList = React.createClass({
         this._page = this.props.page || 1;
         this._max = Number(localStorage.getItem("uberjobs.settings.queues.max")) || 20;
         this.updateList(true);
-        this._intervalid = setInterval(this.updateList, 5000)
+        this._intervalid = setInterval(this.updateList, SettingsStore.getSetting(UserSettings.REFRESH_INTERVAL))
     },
 
     componentWillUnmount: function () {

@@ -3,6 +3,7 @@
 //= require ../lib/react-mini-router.js
 //= require ../stores/worker-store.js
 //= require ../stores/queue-store.js
+//= require ../stores/settings-store.js
 //= require commons.jsx
 
 var WorkerList = React.createClass({
@@ -40,7 +41,7 @@ var WorkerList = React.createClass({
         this._page = this.props.page || 1;
         this._max = Number(localStorage.getItem("uberjobs.settings.worker.max")) || 20;
         this.updateList(true);
-        this._intervalid = setInterval(this.updateList, 5000)
+        this._intervalid = setInterval(this.updateList, SettingsStore.getSetting(UserSettings.REFRESH_INTERVAL))
     },
 
     componentWillMount: function () {
@@ -70,7 +71,7 @@ var WorkerList = React.createClass({
     },
 
     maxChanged: function (value) {
-        localStorage.setItem("uberjobs.settings.max", value);
+        localStorage.setItem("uberjobs.settings.worker.max", value);
         this._max = value;
         this.updateList(true);
     },
@@ -157,14 +158,14 @@ var WorkerListItem = React.createClass({
     },
 
     _onStopButtonClicked: function () {
-        WorkerStore.pause(this.props.worker, function () {
+        WorkerStore.stop(this.props.worker, function () {
             this.state.stopSuccess = true;
             this.setState(this.state);
         }.bind(this))
     },
 
-    _onResumeButtonClicked: function (argument) {
-        WorkerStore.pause(this.props.worker, function () {
+    _onResumeButtonClicked: function () {
+        WorkerStore.resume(this.props.worker, function () {
             this.state.resumeSuccess = true;
             this.setState(this.state);
         }.bind(this))
@@ -183,13 +184,15 @@ var WorkerListItem = React.createClass({
 
         var pauseOrResumeButton = {};
         var stopButton = {};
+        var editButton = {}
         if(worker.status === 'PAUSED') {
-            pauseOrResumeButton = (<a href="javascript: void(0)" onClick={this._onResumeButtonClicked} className="btn btn-default"><i className="fa fa-resume"></i></a>);
+            pauseOrResumeButton = (<a href="javascript: void(0)" onClick={this._onResumeButtonClicked} className="btn btn-default"><i className="fa fa-play"></i></a>);
         } else if(worker.status !== 'STOPPED') {
             pauseOrResumeButton = (<a href="javascript: void(0)" onClick={this._onPauseButtonClicked} className="btn btn-default"><i className="fa fa-pause"></i></a>);
         }
         if(worker.status !== 'STOPPED') {
-            var stopButton = (<a href="javascript: void(0)" onClick={this._onStopButtonClicked} className="btn btn-default"><i className="fa fa-stop"></i></a>);
+            stopButton = (<a href="javascript: void(0)" onClick={this._onStopButtonClicked} className="btn btn-default"><i className="fa fa-stop"></i></a>);
+            editButton = (<a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i className="fa fa-pencil"></i></a>);
         }
         return (<tr>
             <td>{worker.status}</td>
@@ -201,7 +204,7 @@ var WorkerListItem = React.createClass({
                 <pre className={queueNameClasses}>{queueNames.join(", ")}</pre>
             </td>
             <td>
-                <a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i className="fa fa-pencil"></i></a>
+                {editButton}
                 {pauseOrResumeButton}
                 {stopButton}
             </td>

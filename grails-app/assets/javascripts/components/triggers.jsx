@@ -7,6 +7,7 @@
 //= require ../lib/lodash.js
 //= require ../stores/job-meta-store.js
 //= require ../stores/trigger-store.js
+//= require ../stores/settings-store.js
 //= require paginator.jsx
 //= require commons.jsx
 
@@ -28,7 +29,7 @@ var TriggerList = React.createClass({
 
     componentDidMount: function () {
         this.updateList();
-        this._intervalid = setInterval(this.updateList, 5000);
+        this._intervalid = setInterval(this.updateList, SettingsStore.getSetting(UserSettings.REFRESH_INTERVAL));
     },
 
     componentWillMount: function () {

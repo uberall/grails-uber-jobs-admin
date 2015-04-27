@@ -9,6 +9,13 @@
 //= require components/queues.jsx
 //= require components/workers.jsx
 //= require components/overview.jsx
+//= require components/settings.jsx
+//= require stores/settings-store.jsx
+
+// initialize the settings store so we are sure we have the basic user settings set
+SettingsStore.get(function () {
+  console.log("Initial User settings loaded")
+});
 
 var App = React.createClass({
 
@@ -22,7 +29,8 @@ var App = React.createClass({
         '/triggers/details/:id': 'triggerDetails',
         '/workers/:page': 'workerList',
         '/worker/:id': 'workerDetails',
-        '/queues/:page': 'queueList'
+        '/queues/:page': 'queueList',
+        '/settings': 'settings'
     },
 
     render: function() {
@@ -86,9 +94,13 @@ var App = React.createClass({
         return <div>{text}</div>;
     },
 
+    settings: function () {
+      return <Settings />
+    },
+
     notFound: function(path) {
         return <div class="not-found">Page Not Found: {path}</div>;
-    }
+    },
 
 });
 
