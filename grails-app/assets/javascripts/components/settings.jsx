@@ -36,6 +36,7 @@ var Settings = React.createClass({
 	_onFormReset: function (e) {
 		e.preventDefault();
 		this.state.settings = _.clone(this._initalValue, true);
+		this.state.success = null;
 		this.setState(this.state);
 	},
 
