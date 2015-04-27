@@ -227,11 +227,19 @@ var WorkerDetails = React.createClass({
       };
     },
 
+    componentWillReceiveProps: function(nextProps) {
+        this._onPropsChanged(nextProps.worker)
+    },
+
     componentWillMount: function() {
-        if(this.props.worker === 'add') {
-            // do nothing as we want to add a worker
-        } else if(!isNaN(this.props.worker)){
-            WorkerStore.get(this.props.worker, function (resp) {
+        this._onPropsChanged(this.props.worker)
+    },
+
+    _onPropsChanged: function (id) {
+        if(id === 'add') {
+            this.setState(this.getInitialState());
+        } else if(!isNaN(id)){
+            WorkerStore.get(id, function (resp) {
                 this._initialValue = _.clone(resp.worker, true);
                 this.state.worker = resp.worker;
                 this.setState(this.state);
@@ -249,20 +257,17 @@ var WorkerDetails = React.createClass({
     },
 
     onSaveSuccess: function (response) {
+        this.state.sending = false;
+        this.state.success = true;
+        this.state.worker = response.worker;
+        this.state.errors = {}
+        this.state.errorCode = {}
+        this._initialValue = _.clone(response.worker, true);
+        this.setState(this.state)
         if(this.props.worker === 'add'){
-            debugger;
             // just navigate to update page of the created worker
-            ReactMiniRouter.navigate("/worker/"+response.worker.id)
-        } else {
-            this.state.sending = false;
-            this.state.success = true;
-            this.state.worker = response.worker;
-            this.state.errors = {}
-            this.state.errorCode = {}
-            this._initialValue = _.clone(response.worker, true);
-            this.setState(this.state)
-        }
-        
+            ReactMiniRouter.navigate("/worker/"+response.worker.id, true)
+        }         
     },
 
     onSaveError: function (response) {
