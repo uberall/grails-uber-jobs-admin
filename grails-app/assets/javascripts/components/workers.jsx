@@ -252,7 +252,7 @@ var WorkerDetails = React.createClass({
         if(this.props.worker === 'add'){
             debugger;
             // just navigate to update page of the created worker
-            ReactMiniRouter.navigate("/worker/"+response.worker.id, true)
+            ReactMiniRouter.navigate("/worker/"+response.worker.id)
         } else {
             this.state.sending = false;
             this.state.success = true;
