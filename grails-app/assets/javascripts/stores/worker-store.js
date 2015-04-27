@@ -31,7 +31,23 @@ var WorkerStore = {
 		})
 	},
 
+	pause: function (worker, success) {
+		$.ajax({
+			url: window.baseUrl + "/" + this.basePath + "/" + worker.id + "/pause",
+			method: "PUT",
+			contentType : "application/json",
+			success: success
+		})	
+	},
 
+	stop: function (worker, success) {
+		$.ajax({
+			url: window.baseUrl + "/" + this.basePath + "/" + worker.id + "/pause",
+			method: "PUT",
+			contentType : "application/json",
+			success: success
+		})	
+	},
 
 	add: function (worker, success, error) {
 		$.ajax({

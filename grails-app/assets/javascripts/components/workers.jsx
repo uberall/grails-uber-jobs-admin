@@ -133,7 +133,10 @@ var WorkerList = React.createClass({
 var WorkerListItem = React.createClass({
     getInitialState: function() {
         return {
-            showQueues: false 
+            showQueues: false,
+            pauseSuccess: null,
+            stopSuccess: null,
+            resumeSuccess: null,
         };
     },
 
@@ -146,6 +149,27 @@ var WorkerListItem = React.createClass({
         ReactMiniRouter.navigate("/worker/" + this.props.worker.id)
     },
 
+    _onPauseButtonClicked: function () {
+        WorkerStore.pause(this.props.worker, function () {
+            this.state.pauseSuccess = true;
+            this.setState(this.state);
+        }.bind(this))
+    },
+
+    _onStopButtonClicked: function () {
+        WorkerStore.pause(this.props.worker, function () {
+            this.state.stopSuccess = true;
+            this.setState(this.state);
+        }.bind(this))
+    },
+
+    _onResumeButtonClicked: function (argument) {
+        WorkerStore.pause(this.props.worker, function () {
+            this.state.resumeSuccess = true;
+            this.setState(this.state);
+        }.bind(this))
+    },
+
     render: function () {
         var cx = React.addons.classSet;
         var worker = this.props.worker
@@ -156,6 +180,17 @@ var WorkerListItem = React.createClass({
         _.each(worker.queues, function (queue) {
             queueNames.push(queue.name);
         })
+
+        var pauseOrResumeButton = {};
+        var stopButton = {};
+        if(worker.status === 'PAUSED') {
+            pauseOrResumeButton = (<a href="javascript: void(0)" onClick={this._onResumeButtonClicked} className="btn btn-default"><i className="fa fa-resume"></i></a>);
+        } else if(worker.status !== 'STOPPED') {
+            pauseOrResumeButton = (<a href="javascript: void(0)" onClick={this._onPauseButtonClicked} className="btn btn-default"><i className="fa fa-pause"></i></a>);
+        }
+        if(worker.status !== 'STOPPED') {
+            var stopButton = (<a href="javascript: void(0)" onClick={this._onStopButtonClicked} className="btn btn-default"><i className="fa fa-stop"></i></a>);
+        }
         return (<tr>
             <td>{worker.status}</td>
             <td>{worker.hostname}</td>
@@ -165,8 +200,11 @@ var WorkerListItem = React.createClass({
                 <button type="button" className="btn btn-default" onClick={this.onQueueButtonPressed}>{worker.queues.length}</button>
                 <pre className={queueNameClasses}>{queueNames.join(", ")}</pre>
             </td>
-            <td><a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i
-                    className="fa fa-pencil"></i></a></td>
+            <td>
+                <a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i className="fa fa-pencil"></i></a>
+                {pauseOrResumeButton}
+                {stopButton}
+            </td>
         </tr>)
     }
 });
