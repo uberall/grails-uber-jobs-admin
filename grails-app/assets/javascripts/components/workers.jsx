@@ -235,22 +235,24 @@ var WorkerDetails = React.createClass({
                 this._initialValue = _.clone(resp.worker, true);
                 this.state.worker = resp.worker;
                 this.setState(this.state);
-                QueueStore.list('name', 'asc', 1000, 0, function (response) {
-                    this.state.queues = response.list;
-                    this.setState(this.state);
-                }.bind(this))
             }.bind(this), function () {
                 ReactMiniRouter.navigate("/workers/1");
             })
         } else {
             ReactMiniRouter.navigate("/workers/1");
         }
+
+        QueueStore.list('name', 'asc', 1000, 0, function (response) {
+            this.state.queues = response.list;
+            this.setState(this.state);
+        }.bind(this))
     },
 
     onSaveSuccess: function (response) {
         if(this.props.worker === 'add'){
+            debugger;
             // just navigate to update page of the created worker
-            ReactMiniRouter.navigate("/worker/"+respone.worker.id, true)
+            ReactMiniRouter.navigate("/worker/"+response.worker.id, true)
         } else {
             this.state.sending = false;
             this.state.success = true;
@@ -280,6 +282,8 @@ var WorkerDetails = React.createClass({
         this.setState(this.state)
         if(this.state.worker.id) {
             WorkerStore.update(this.state.worker, this.onSaveSuccess, this.onSaveError);
+        } else {
+            WorkerStore.create(this.state.worker, this.onSaveSuccess, this.onSaveError);
         }
     },
 
@@ -306,6 +310,13 @@ var WorkerDetails = React.createClass({
         this.setState(this.state);
     },
 
+    _onPoolNameChange: function (e) {
+        if(this.state.worker.id === undefined) {
+            this.state.worker.poolName = e.target.value;
+            this.setState(this.state);
+        }
+    },
+
     render: function() {
         var worker = this.state.worker;
         var cx = React.addons.classSet;
@@ -321,21 +332,12 @@ var WorkerDetails = React.createClass({
             "disabled": this.state.sending
         });
 
-        var selectedOptions = [];
-        var notSelectedOptions = [];
+        var queueOptions = [];
         _.each(this.state.queues, function (queue) {
             var enabled = _.find(worker.queues, function(q) {
               return q.id === queue.id;
             }) !== undefined;
-            /**
-            if(enabled) {
-                // we place selected options into an extra array to have them on the top of the select box, but we still want them to be ordered by name
-                selectedOptions.push(<option value={queue.id} selected={enabled} key={"q"+queue.id}>{queue.name}</option>)    
-            } else {
-                notSelectedOptions.push(<option value={queue.id} selected={enabled} key={"q"+queue.id}>{queue.name}</option>)    
-            }
-            **/
-            notSelectedOptions.push(<option value={queue.id} key={"q"+queue.id}>{queue.name}</option>)    
+            queueOptions.push(<option value={queue.id} key={"q"+queue.id}>{queue.name}</option>)    
         });
 
         var selectedIds = [];
@@ -345,9 +347,9 @@ var WorkerDetails = React.createClass({
 
         var alertMessage = "";
         if(this.state.success) {
-            alertMessage = "Successfully saved."
+            alertMessage = "Worker started."
         } else if(this.state.success === false) {
-            alertMessage = "Saving failed."
+            alertMessage = "Starting failed."
             if(this.state.errorCode){
                 alertMessage += " (" + this.state.errorCode + ")";
             }
@@ -382,12 +384,11 @@ var WorkerDetails = React.createClass({
                     </div>
 
                     <div className="form-group">
-                        <label className="col-sm-2 control-label">Index</label>
+                        <label className="col-sm-2 control-label">Queues</label>
 
                         <div className="col-sm-10">
                             <select value={selectedIds} className="form-control" size="20" name="queues" onChange={this._onQueueSelectionChanged} multiple={true}>
-                                {selectedOptions}
-                                {notSelectedOptions}
+                                {queueOptions}
                             </select>
                         </div>
                     </div>

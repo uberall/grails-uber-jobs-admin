@@ -58,7 +58,7 @@ var WorkerStore = {
 		})	
 	},
 
-	add: function (worker, success, error) {
+	create: function (worker, success, error) {
 		$.ajax({
 			url: window.baseUrl + "/" + this.basePath + "/",
 			method: "POST",

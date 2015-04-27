@@ -90,7 +90,7 @@ var Navbar = React.createClass({
                                     className="caret"></span></a>
                                 <ul className="dropdown-menu" role="menu">
                                     <NavbarItem text="List" action={Actions.WORKER_LIST} target="/workers/1"/>
-                                    {/* <NavbarItem text="Add" action={Actions.WORKER_MANUAL} target="/worker/add"/>*/}
+                                    <NavbarItem text="Add" action={Actions.WORKER_MANUAL} target="/worker/add"/>
                                 </ul>
                             </li>
                             <NavbarItem text="Queues" action={Actions.QUEUES} target="/queues/1"/>
