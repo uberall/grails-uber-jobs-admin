@@ -74,6 +74,7 @@ var App = React.createClass({
 
     workerDetails: function(id){
       window.action = Actions.WORKER_DETAILS;
+      return <WorkerDetails worker={id} />
     },
 
     queueList: function(page){

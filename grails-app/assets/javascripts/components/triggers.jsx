@@ -182,7 +182,7 @@ var TriggerDetails = React.createClass({
     },
 
     onFormReset: function (e) {
-        this.state.trigger = this._initialValue;
+        this.state.trigger = _.clone(this._initialValue, true);
         this.state.success = null;
         this.setState(this.state);
         e.preventDefault();

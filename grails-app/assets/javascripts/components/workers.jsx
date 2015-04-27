@@ -2,6 +2,7 @@
 //= require react-with-addons
 //= require ../lib/react-mini-router.js
 //= require ../stores/worker-store.js
+//= require ../stores/queue-store.js
 //= require commons.jsx
 
 var WorkerList = React.createClass({
@@ -172,25 +173,31 @@ var WorkerListItem = React.createClass({
 
 var WorkerDetails = React.createClass({
 
-    _initialWorker: null,
+    _initialValue: null,
 
     getInitialState: function() {
       return {
         worker: {},
         errors: {},
+        errorCode: null,
+        queues: {},
         sending: false,
         success: null
       };
     },
 
     componentWillMount: function() {
-        if(this.props.id === 'add') {
+        if(this.props.worker === 'add') {
             // do nothing as we want to add a worker
-        } else if(!isNaN(this.props.id)){
-            WorkerStore.get(this.props.id, function (resp) {
-                this._initialWorker = _.clone(response.worker, true);
+        } else if(!isNaN(this.props.worker)){
+            WorkerStore.get(this.props.worker, function (resp) {
+                this._initialValue = _.clone(resp.worker, true);
                 this.state.worker = resp.worker;
                 this.setState(this.state);
+                QueueStore.list('name', 'asc', 1000, 0, function (response) {
+                    this.state.queues = response.list;
+                    this.setState(this.state);
+                }.bind(this))
             }.bind(this), function () {
                 ReactMiniRouter.navigate("/workers/1");
             })
@@ -200,14 +207,16 @@ var WorkerDetails = React.createClass({
     },
 
     onSaveSuccess: function (response) {
-        if(this.props.id === 'add'){
+        if(this.props.worker === 'add'){
             // just navigate to update page of the created worker
             ReactMiniRouter.navigate("/worker/"+respone.worker.id, true)
         } else {
             this.state.sending = false;
             this.state.success = true;
             this.state.worker = response.worker;
-            this._initialWorker = _.clone(response.worker, true);
+            this.state.errors = {}
+            this.state.errorCode = {}
+            this._initialValue = _.clone(response.worker, true);
             this.setState(this.state)
         }
         
@@ -216,22 +225,144 @@ var WorkerDetails = React.createClass({
     onSaveError: function (response) {
         this.state.sending = false;
         this.state.success = false;
-        this.state.error = resp.responseJSON.error;
+        if(response.status === 400){
+            this.state.error = response.responseJSON.error;
+        } else {
+           this.state.errorCode = response.status
+        }
         this.setState(this.state)
-    }
+    },
 
     onFormSubmit: function (e) {
+        e.preventDefault();
         this.state.sending = true;
         this.setState(this.state)
         if(this.state.worker.id) {
-            WorkerStore.update(worker, this.onSaveSuccess, this.onSaveError)
+            WorkerStore.update(this.state.worker, this.onSaveSuccess, this.onSaveError);
         }
+    },
+
+    onFormReset: function (e) {
+        this.state.worker = _.clone(this._initialValue, true);
+        this.state.success = null;
+        this.state.errors = {}
+        this.state.errorCode = {}
+        this.setState(this.state);
         e.preventDefault();
-    }
+    },
+
+    _onQueueSelectionChanged: function (e) {
+        var ids = $(e.target).val();
+        var newQueues = [];
+        _.each(ids, function (idString) {
+            var id = Number(idString);
+            var queue = _.find(this.state.queues, function (queue) {
+                return queue.id === id;
+            })
+            newQueues.push({id: id, name: queue.name})
+        }.bind(this));
+        this.state.worker.queues = newQueues;
+        this.setState(this.state);
+    },
 
     render: function() {
+        var worker = this.state.worker;
+        var cx = React.addons.classSet;
+        var submitButtonClasses = cx({
+            "btn": true,
+            "btn-default": true,
+            "disabled": this.state.sending
+        });
+
+        var resetButtonClasses = cx({
+            "btn": true,
+            "btn-warning": true,
+            "disabled": this.state.sending
+        });
+
+        var selectedOptions = [];
+        var notSelectedOptions = [];
+        _.each(this.state.queues, function (queue) {
+            var enabled = _.find(worker.queues, function(q) {
+              return q.id === queue.id;
+            }) !== undefined;
+            /**
+            if(enabled) {
+                // we place selected options into an extra array to have them on the top of the select box, but we still want them to be ordered by name
+                selectedOptions.push(<option value={queue.id} selected={enabled} key={"q"+queue.id}>{queue.name}</option>)    
+            } else {
+                notSelectedOptions.push(<option value={queue.id} selected={enabled} key={"q"+queue.id}>{queue.name}</option>)    
+            }
+            **/
+            notSelectedOptions.push(<option value={queue.id} key={"q"+queue.id}>{queue.name}</option>)    
+        });
+
+        var selectedIds = [];
+        _.each(worker.queues, function (queue) {
+            selectedIds.push(queue.id)
+        });
+
+        var alertMessage = "";
+        if(this.state.success) {
+            alertMessage = "Successfully saved."
+        } else if(this.state.success === false) {
+            alertMessage = "Saving failed."
+            if(this.state.errorCode){
+                alertMessage += " (" + this.state.errorCode + ")";
+            }
+        }
         return (
-            <div />
+            <div className="row">
+                <div className="col-sm-12">
+                    
+                    <form className="form-horizontal" onSubmit={this.onFormSubmit} onReset={this.onFormReset}>
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label">Pool</label>
+
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" value={worker.poolName} readOnly={true}/>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label">Hostname</label>
+
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" value={worker.hostname} readOnly={true}/>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label">Index</label>
+
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" value={worker.index} readOnly={true}/>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label">Index</label>
+
+                        <div className="col-sm-10">
+                            <select value={selectedIds} className="form-control" size="20" name="queues" onChange={this._onQueueSelectionChanged} multiple={true}>
+                                {selectedOptions}
+                                {notSelectedOptions}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="form-group">
+                        <div className="col-sm-offset-2 col-sm-10">
+                            <button type="submit" className={submitButtonClasses}>Save</button>
+                            <button type="reset" className={resetButtonClasses}>Reset</button>
+                        </div>
+                    </div>
+                    <div className="col-sm-10 col-sm-offset-2">
+                        <Alert visible={this.state.success !== null} type={this.state.success ? 'success' : 'danger'} text={alertMessage} />
+                    </div>
+                </form>
+                </div>
+            </div>
         );
     }
 });

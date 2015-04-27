@@ -167,3 +167,49 @@ var Typeahead = React.createClass({
         );
     }
 });
+
+var Alert = React.createClass({
+
+    propTypes: {
+        visible: React.PropTypes.bool.isRequired,
+        type: React.PropTypes.oneOf(['success', 'danger', 'warning'])
+    },
+
+    getInitialState: function() {
+        return {
+            visible: false 
+        };
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+      this.state.visible = nextProps.visible
+      this.setState(this.state);
+    },
+
+    _hideAlert: function () {
+        this.state.visible = false;
+        this.setState(this.state)
+    },
+
+    render: function (argument) {
+        var cx = React.addons.classSet;
+        var alertClasses = cx({
+            "alert": true,
+            "alert-dismissible": true,
+            "hidden": !this.state.visible, 
+            "alert-success": this.props.type === "success",
+            "alert-danger": this.props.type === "danger",
+            "alert-warning": this.props.type === "warning",
+        });
+        return (
+            <div className={alertClasses} role="alert">
+                <button type="button" className="close" aria-label="Close" onClick={this._hideAlert}>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>{this.props.text}</strong>
+            </div>
+            )
+    }
+
+
+});
