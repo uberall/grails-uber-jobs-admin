@@ -217,6 +217,16 @@ var TriggerDetails = React.createClass({
             "hidden": this.state.success !== true
         });
 
+        var alertMessage = "";
+        if(this.state.success) {
+            alertMessage = "Successfully saved."
+        } else if(this.state.success === false) {
+            alertMessage = "Saving failed."
+            if(this.state.errorCode){
+                alertMessage += " (" + this.state.errorCode + ")";
+            }
+        }
+        
         if (this.state.trigger.id !== undefined) {
             content = (
                 <form className="form-horizontal" onSubmit={this.onFormSubmit} onReset={this.onFormReset}>

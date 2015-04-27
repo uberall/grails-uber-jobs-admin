@@ -5,6 +5,7 @@
 //= require lib/react-mini-router.js
 //= require components/navbar.jsx
 //= require components/jobs.jsx
+//= require components/job-meta.jsx
 //= require components/triggers.jsx
 //= require components/queues.jsx
 //= require components/workers.jsx
@@ -30,6 +31,8 @@ var App = React.createClass({
         '/workers/:page': 'workerList',
         '/worker/:id': 'workerDetails',
         '/queues/:page': 'queueList',
+        '/types/:page': 'typeList',
+        '/type/:id': 'typeDetails',
         '/settings': 'settings'
     },
 
@@ -59,6 +62,17 @@ var App = React.createClass({
       return <JobList page={this.getPageAsNumber(page)}/>;
     },
 
+    typeList: function(page){
+      window.action = Actions.JOB_META_LIST;
+      
+      return <JobMetaList page={this.getPageAsNumber(page)}/>;
+    },
+
+    typeDetails: function (id) {
+      window.action = Actions.JOB_META_DETAILS;
+      return <JobMetaDetails id={parseInt(id)}/>;
+    },
+
     triggerList: function(page){
       window.action = Actions.TRIGGER_LIST;
       
@@ -66,7 +80,7 @@ var App = React.createClass({
     },
 
     triggerDetails: function (id) {
-      window.action = Actions.Trigger_DETAILS;
+      window.action = Actions.TRIGGER_DETAILS;
       return <TriggerDetails id={parseInt(id)}/>;
     },
 

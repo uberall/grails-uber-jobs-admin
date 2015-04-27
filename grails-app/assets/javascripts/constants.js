@@ -4,6 +4,8 @@ var Actions = {
   'OVERVIEW': 'overview',
   'JOBS_LIST': 'jobslist',
   'JOBS_MANUAL': 'jobsmanual',
+  'JOB_META_LIST': 'jobMetaList',
+  'JOB_META_DETAILS': 'jobMetaDetails',
   'WORKER_LIST': 'workersList',
   'WORKER_DETAILS': 'workersDetails',
   'QUEUES': 'queues',

@@ -94,6 +94,7 @@ var Navbar = React.createClass({
                                 </ul>
                             </li>
                             <NavbarItem text="Queues" action={Actions.QUEUES} target="/queues/1"/>
+                            <NavbarItem text="Job Types" action={Actions.JOB_META_LIST} target="/types/1"/>
                         </ul>
                         <ul className="nav navbar-nav navbar-right">
                             <PauseNavbarItem />

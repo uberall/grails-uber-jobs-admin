@@ -59,6 +59,7 @@ var SortableColumn = React.createClass({
 var ValidateableInput = React.createClass({
 
     propTypes: {
+        type: React.PropTypes.string,
         field: React.PropTypes.string.isRequired,
         text: React.PropTypes.string.isRequired,
         value: React.PropTypes.any,
@@ -81,7 +82,7 @@ var ValidateableInput = React.createClass({
                 <label htmlFor={this.props.field} className="col-sm-2 control-label">{this.props.text}</label>
 
                 <div className="col-sm-10">
-                    <input type="text" className="form-control" id={this.props.field} name={this.props.field} placeholder={this.props.placeholder || this.props.text}
+                    <input type={this.props.type || "text"} className="form-control" id={this.props.field} name={this.props.field} placeholder={this.props.placeholder || this.props.text}
                            required={this.props.required} value={this.props.value} onChange={this.props.onChange}/>
                 </div>
             </div>
