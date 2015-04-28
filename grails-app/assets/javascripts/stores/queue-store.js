@@ -25,7 +25,7 @@ var QueueStore = {
     },
 
     get: function (id, callback) {
-        if (this._queue[id] === undefined) {
+        if (this._queues[id] === undefined) {
             $.ajax({
                 url: window.baseUrl + "/" + this.basePath + "/" + id,
                 success: function (resp) {
@@ -34,11 +34,12 @@ var QueueStore = {
                 }.bind(this)
             })
         } else {
-            callback(this._queue[id])
+            callback(this._queues[id])
         }
     },
 
     _addToQueues: function (queue) {
         this._queues[queue.id] = queue;
-    }
+    },
+
 }

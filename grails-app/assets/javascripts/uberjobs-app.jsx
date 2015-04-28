@@ -15,7 +15,7 @@
 
 // initialize the settings store so we are sure we have the basic user settings set
 SettingsStore.get(function () {
-  console.log("Initial User settings loaded")
+  console.log("Initial User settings loaded");
 });
 
 var App = React.createClass({
@@ -26,6 +26,7 @@ var App = React.createClass({
         '/': 'home',
         '/jobs/enqueue': 'jobEnqueue',
         '/jobs/:page': 'jobList',
+        "/job/:id": 'jobDetails',
         '/triggers/:page': 'triggerList',
         '/triggers/details/:id': 'triggerDetails',
         '/workers/:page': 'workerList',
@@ -54,6 +55,11 @@ var App = React.createClass({
     home: function() {
         window.action = Actions.OVERVIEW;
         return <Overview />;
+    },
+
+    jobDetails: function (id) {
+      window.action = Actions.JOBS_DETAILS;
+      return <JobDetailsView job={Number(id)} />
     },
 
     jobList: function(page){

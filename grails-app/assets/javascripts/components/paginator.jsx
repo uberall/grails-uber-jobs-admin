@@ -49,7 +49,7 @@ var Pager = React.createClass({
         }
         pages.push(<NextButton current={this.props.current} max={this.props.pages} pageChange={this.toPage} key="next"/>);
         return (
-            <ul className="pagination pull-right">
+            <ul className="pagination pagination-sm pull-right">
                 {pages}
             </ul>
         )

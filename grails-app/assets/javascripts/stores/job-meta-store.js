@@ -6,6 +6,7 @@
 var JobMetaStore = {
 
   basePath: "jobmetas",
+  _jobs: {},
 
   list: function(sort, order, max, offset, success) {
     $.ajax({
@@ -16,7 +17,14 @@ var JobMetaStore = {
         max: max,
         offset: offset
       },
-      success: success
+      success: function (response) {
+        _.each(response.list, function (job) {
+          this._addToJobs(job)
+        }.bind(this))
+        if(success !== undefined){
+          success(response)
+        }
+      }.bind(this)
     });
   },
 
@@ -37,6 +45,24 @@ var JobMetaStore = {
       success: success,
       error: error
     })
-  }
+  },
+
+  get: function (id, success) {
+    if (this._jobs[id] === undefined) {
+            $.ajax({
+                url: window.baseUrl + "/" + this.basePath + "/" + id,
+                success: function (resp) {
+                    this._addToJobs(resp.jobMeta);
+                    success(resp.jobMeta)
+                }.bind(this)
+            })
+        } else {
+            success(this._jobs[id])
+        }
+  },
+
+  _addToJobs: function (job) {
+      this._jobs[job.id] = job;
+  },
 
 };

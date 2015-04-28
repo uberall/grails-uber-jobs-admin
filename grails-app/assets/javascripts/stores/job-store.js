@@ -2,7 +2,6 @@
   "use strict";  
 }());
 
-
 var JobStore = {
 
   basePath: "jobs",
@@ -21,13 +20,29 @@ var JobStore = {
     });
   },
 
-  enqueue: function(job, callback){
+  enqueue: function(job, success){
     $.ajax({
       url: window.baseUrl + "/" + this.basePath,
       method: "POST",
       contentType : "application/json",
       data: JSON.stringify(job),
-      success: callback
+      success: success
+    });
+  },
+
+  get: function (jobId, success) {
+    $.ajax({
+      url: window.baseUrl + "/" + this.basePath + "/" + jobId,
+      contentType : "application/json",
+      success: success
+    });
+  },
+
+  getFailure: function (jobId, success) {
+    $.ajax({
+      url: window.baseUrl + "/" + this.basePath + "/" + jobId + "/failure",
+      contentType : "application/json",
+      success: success
     });
   }
 };

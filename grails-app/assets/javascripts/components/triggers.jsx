@@ -118,7 +118,7 @@ var TriggerListItem = React.createClass({
                 <td><FromNow time={trigger.lastFired}/></td>
                 <td>{trigger.cronExpression}</td>
                 <td>{JSON.stringify(trigger.argument)}</td>
-                <td><a href="javascript: void(0)" onClick={this.editButtonClicked} className="btn btn-sm btn-default"><i
+                <td><a href="javascript: void(0)" onClick={this.editButtonClicked} className="btn btn-xs btn-default"><i
                     className="fa fa-pencil"></i></a></td>
             </tr>
         )

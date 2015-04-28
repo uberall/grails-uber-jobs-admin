@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>UberJobs-Admin</title>
+    <link href='//fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <asset:stylesheet src="uberjobs-admin" />
     <asset:javascript src="uberjobs-admin" />
     <script type="text/javascript">

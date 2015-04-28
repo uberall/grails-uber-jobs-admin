@@ -9,6 +9,13 @@ var FromNow = React.createClass({
     }
 });
 
+var FormatDate = React.createClass({
+
+    render: function () {
+        return (<span>{moment(this.props.time).format("DD.MM.YY, HH:mm:ss.SSS")}</span>)
+    }
+});
+
 var MaxButtonGroup = React.createClass({
 
     propTypes: {
@@ -26,7 +33,7 @@ var MaxButtonGroup = React.createClass({
         var maxes = [20, 50, 100]
         var buttons = []
         _.each(this.props.numbers, function (value) {
-            var classes = cx({"btn": true, "btn-default": this.props.current !== value, "btn-success": this.props.current === value});
+            var classes = cx({"btn": true, "btn-xs": true, "btn-default": this.props.current !== value, "btn-success": this.props.current === value});
             buttons.push(<button onClick={this.buttonClicked} type="button" className={classes} key={value} data-value={value}>{value}</button>)
         }.bind(this));
         return (<div className="btn-group" role="group" aria-label="MaxFilter">{buttons}</div>)

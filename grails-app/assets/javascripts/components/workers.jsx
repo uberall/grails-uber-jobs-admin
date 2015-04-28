@@ -86,12 +86,14 @@ var WorkerList = React.createClass({
         
         var idlingButtonClasses = cx({
             "btn": true,
+            "btn-xs": true,
             "btn-default": !this._includeIdle,
             "btn-success": this._includeIdle,
         });
 
         var stoppedButtonClasses = cx({
             "btn": true,
+            "btn-xs": true,
             "btn-default": !this._includeStopped,
             "btn-success": this._includeStopped,
         });
@@ -192,7 +194,7 @@ var WorkerListItem = React.createClass({
         }
         if(worker.status !== 'STOPPED') {
             stopButton = (<a href="javascript: void(0)" onClick={this._onStopButtonClicked} className="btn btn-default"><i className="fa fa-stop"></i></a>);
-            editButton = (<a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i className="fa fa-pencil"></i></a>);
+            // editButton = (<a href="javascript: void(0)" onClick={this.onEditButtonClicked} className="btn btn-default"><i className="fa fa-pencil"></i></a>);
         }
         return (<tr>
             <td>{worker.status}</td>

@@ -100,7 +100,7 @@ var JobList = React.createClass({
         var buttons = [];
         _.each(this._filterAvailable, function (filter) {
             var choosen = _.indexOf(this._filters, filter) > -1;
-            var classes = cx({"btn": true, "btn-default": choosen === false, "btn-success": choosen === true});
+            var classes = cx({"btn": true,"btn-xs": true, "btn-default": choosen === false, "btn-success": choosen === true});
             buttons.push(<button onClick={this.filterButtonClicked} type="button" className={classes} key={filter} data-filter={filter}>{filter}</button>)
         }.bind(this));
 
@@ -111,8 +111,8 @@ var JobList = React.createClass({
                         <div className="btn-toolbar">
                             <div className="btn-group" role="group" aria-label="StatusFilter">
                                 {buttons}
-                                <button onClick={this.allButtonClicked} type="button" className="btn btn-default" key="ALL">all</button>
-                                <button onClick={this.resetbuttonClicked} type="button" className="btn btn-default" key="NONE">clear</button>
+                                <button onClick={this.allButtonClicked} type="button" className="btn btn-xs btn-default" key="ALL">all</button>
+                                <button onClick={this.resetbuttonClicked} type="button" className="btn btn-xs btn-default" key="NONE">clear</button>
                             </div>
                             <MaxButtonGroup current={this._max} numbers={[20,50,100,1000]} onChange={this.maxChanged} />
                         </div>
@@ -127,8 +127,9 @@ var JobList = React.createClass({
                             <SortableColumn text="Job" field="job" onToggled={this.sortChanged} current={this._sort}/>
                             <SortableColumn text="Status" field="status" onToggled={this.sortChanged} current={this._sort}/>
                             <SortableColumn text="Started" field="started" onToggled={this.sortChanged} current={this._sort}/>
-                            <SortableColumn text="Done" field="done" onToggled={this.sortChanged} current={this._sort}/>
+                            <th>Took</th>
                             <th>Arguments</th>
+                            <th></th>
                             </thead>
                             <tbody>
                             {listItems}
@@ -143,16 +144,66 @@ var JobList = React.createClass({
 });
 
 var JobListItem = React.createClass({
+
+    getInitialState: function() {
+      return {
+        queue: {},
+        jobMeta: {},
+      };
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+        if(this.state.queue.id !== nextProps.job.queue){
+            this._queueChanged(nextProps.job.queue)
+        }
+        if(this.state.jobMeta.id !== nextProps.job.job){
+            this._jobMetaChanged(nextProps.job.job)
+        }
+    },
+
+    componentDidMount: function() {
+        this._queueChanged(this.props.job.queue)
+        this._jobMetaChanged(this.props.job.job)  
+    },
+
+    _queueChanged: function (queueId) {
+        QueueStore.get(queueId, function (queue) {
+            this.state.queue = queue;
+            this.setState(this.state);
+        }.bind(this));
+    },
+
+    _jobMetaChanged: function (jobId) {
+        JobMetaStore.get(jobId, function (job) {
+            this.state.jobMeta = job;
+            this.setState(this.state);
+        }.bind(this));
+    },
+
+    _gotoDetails: function () {
+        ReactMiniRouter.navigate("/job/" + this.props.job.id);
+    },
+
     render: function () {
         var job = this.props.job;
+        var started = ""
+        if(job.started){
+            started = <FromNow time={job.started} />
+        }
+        var jobName = job.job
+        if(this.state.jobMeta.job){
+            var realName = this.state.jobMeta.job;
+            jobName = realName.substr(realName.lastIndexOf(".")+1)
+        }
         return (<tr>
             <td><FromNow time={job.doAt}/></td>
-            <td>{job.queue}</td>
-            <td>{job.job}</td>
+            <td>{this.state.queue.name || job.queue}</td>
+            <td>{jobName}</td>
             <td>{job.status}</td>
-            <td>{job.started}</td>
-            <td>{job.done}</td>
+            <td>{started}</td>
+            <td>{(job.status !== 'OPEN' ? moment(job.done).diff(moment(job.started)) : "")}</td>
             <td>{JSON.stringify(job.arguments)}</td>
+            <td><button className="btn btn-default btn-xs" onClick={this._gotoDetails}>&nbsp;<i className="fa fa-arrow-right"></i></button></td>
         </tr>);
     }
 });
@@ -313,5 +364,91 @@ var JobArgumentInput = React.createClass({
     render: function () {
         return (<input type="text" name="args" className="form-control" data-argkey={this.props.arg.key}
                        value={this.props.arg.value} onChange={this.props.changed}/>);
+    }
+});
+
+var JobDetailsView = React.createClass({
+
+    propTypes: {
+        job: React.PropTypes.number.isRequired,
+    },
+
+    getInitialState: function() {
+        return {
+            job: {},
+            failure: {},
+            queue: {},
+            jobMeta: {} 
+        };
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+        JobStore.get(propsProps.job, function (response) {
+            this._jobChanged(response.job)
+        }.bind(this))
+    },
+
+    componentWillMount: function() {
+        JobStore.get(this.props.job, function (response) {
+            this._jobChanged(response.job)
+        }.bind(this))
+    },
+
+    _jobChanged: function (job) {
+        this.state.job = job;
+        this.setState(this.state);
+        JobStore.getFailure(job.id, function (response) {
+            this.state.failure = response.failure,
+            this.setState(this.state) 
+        }.bind(this));
+        QueueStore.get(job.queue, function (queue) {
+            this.state.queue = queue;
+            this.setState(this.state);
+        }.bind(this));
+        JobMetaStore.get(job.job, function (jobMeta) {
+            this.state.jobMeta = jobMeta;
+            this.setState(this.state);
+        }.bind(this));
+    },
+
+    render: function() {
+        var failureRows = []
+        if(this.state.failure.id !== undefined) {
+            var stacktrace = []
+            _.each(JSON.parse(this.state.failure.stacktrace), function (stacktraceElement) {
+                stacktrace.push("at " + stacktraceElement.className + "." + stacktraceElement.methodName + ":" + stacktraceElement.lineNumber)
+            })
+            failureRows.push(<dt key="flabel">Failure</dt>)
+            failureRows.push(<dd key="fval">{this.state.failure.message}</dd>)
+            failureRows.push(<dt key="flabel">Exception</dt>)
+            failureRows.push(<dd key="fval">{this.state.failure.exception}</dd>)
+            failureRows.push(<dt key="slabel">Stacktrace</dt>)
+            failureRows.push(<dd key="sval"><pre>{JSON.stringify(stacktrace, 1, 1)}</pre></dd>)
+        }
+        return (
+            <div className="row">
+                <div className="col-sm-12">
+                    <dl className="dl-horizontal">
+                      <dt>Job</dt>
+                      <dd>{this.state.jobMeta.job || this.props.job.job}</dd>
+                      <dt>Queue</dt>
+                      <dd>{this.state.queue.name || this.props.job.queue}</dd>
+                      <dt>Status</dt>
+                      <dd>{this.state.job.status}</dd>
+                      <dt>Arguments</dt>
+                      <dd>{JSON.stringify(this.state.job.arguments)}</dd>
+                      <dt>Enqueued for</dt>
+                      <dd><FormatDate time={this.state.job.doAt} /></dd>
+                      <dt>Started</dt>
+                      <dd><FormatDate time={this.state.job.started} /></dd>
+                      <dt>Finished</dt>
+                      <dd><FormatDate time={this.state.job.done} /></dd>
+                      <dt>Took</dt>
+                      <dd>{moment(this.state.job.done).diff(moment(this.state.job.started))}</dd>
+                      {failureRows}
+                    </dl>
+                </div>
+            </div>
+        );
     }
 });

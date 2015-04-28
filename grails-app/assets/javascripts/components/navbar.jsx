@@ -52,7 +52,7 @@ var PauseNavbarItem = React.createClass({
 var Navbar = React.createClass({
     render: function () {
         var cx = React.addons.classSet;
-        var jobClasses = cx({'dropdown': true, 'active': window.action === Actions.JOBS_LIST || window.action === Actions.JOBS_MANUAL});
+        var jobClasses = cx({'dropdown': true, 'active': window.action === Actions.JOBS_LIST || window.action === Actions.JOBS_MANUAL || window.action === Actions.JOBS_DETAILS});
         var triggerClasses = cx({'dropdown': true, 'active': window.action === Actions.TRIGGER_LIST || window.action === Actions.TRIGGER_DETAILS});
         var workerClasses = cx({'dropdown': true, 'active': window.action === Actions.WORKER_LIST || window.action === Actions.WORKER_DETAILS});
         return (

@@ -126,7 +126,7 @@ var JobMetaListItem = React.createClass({
 				<td>{job.minDelay || 0}</td>
 				<td><i className={singletonClasses}></i></td>
 				<td><FromNow time={job.earliestNextExecution} /></td>
-				<td><a href="javascript: void(0)" onClick={this._onEditButtonClicked} className="btn btn-default"><i className="fa fa-pencil"></i></a></td>
+				<td><a href="javascript: void(0)" onClick={this._onEditButtonClicked} className="btn btn-xs btn-default"><i className="fa fa-pencil"></i></a></td>
 			</tr>
 		);
 	}
